@@ -15,15 +15,29 @@
 //To create a DTO type collection you can use .ToList() on the temp data set
 //You can have a custom anonymous data collection by using a nestes query.
 
+//Step A
+from food in Items
+    group food by new {food.MenuCategoryID, food.CurrentPrice}
+
+//Step B DTO Style dataset
+from food in Items
+    group food by new {food.MenuCategoryID, food.CurrentPrice} into tempdataset
+	select new{
+				MenuCategoryID = tempdataset.Key.MenuCategoryID,
+				CurrentPrice = tempdataset.Key.CurrentPrice,
+				FoodItems = tempdataset.ToList()
+	}
+//Step C DTO custom style dataset
 from food in Items
     group food by new {food.MenuCategoryID, food.CurrentPrice} into tempdataset
 	select new{
 				MenuCategoryID = tempdataset.Key.MenuCategoryID,
 				CurrentPrice = tempdataset.Key.CurrentPrice,
 				FoodItems = from x in tempdataset
-							select new{
-										ItemID = x.ItemID,
-										FoodDescription = x.Description,
-										TimesServed = x.BillItems.Count()
+							select new
+							{
+								ItemID = x.ItemID,
+								FoodDescription = x.Description,
+								TimesServed = x.BillItems.Count()
 							}
 				}
